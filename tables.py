@@ -46,6 +46,15 @@ class Product (p.Model):
         ---------
     """
 
+    self.name = p.CharField(100).
+    self.code = p.BitField(primary_key = True, unique = True)
+    self.brand_name = p.CharField(100)
+    self.categories = []
+    self.description = p.TextField()
+
+    def __init__(self, code, product_name, nutrition_grade_fr, url, *args, **kwargs):
+        self.name = generic_name_fr
+
     class Categories(p.Model):
         """
             The Categories class will gather avery food category fom the
@@ -57,6 +66,11 @@ class Product (p.Model):
             :self.name (CharField(30)): The name of the category.
             :self.id (AutoField(primary_key = True)): 
         """
+        self.id = AutoField(primary_key = True)
+        self.name = Charfield(30)
+        def __init__ (self,nom_mag ):
+            self.id = AutoField(primary_key = True)
+            self.name = nom_mag.upper() # Métaclasse + décorateur ?
 
     class Stores (p.Model):
         """
@@ -93,6 +107,7 @@ class Product (p.Model):
             :self.stores (list[ForeignKeyField(Stores.id)]): The list of the stores
                 where the user can buy the selected product.
             :self.fk_product (ForeignKeyField(Product.name))
+
             Methods :
             ---------
         """
