@@ -9,6 +9,7 @@ verify_ssl = true
 peewee = "*"
 requests = "*"
 pymysql = "*"
+mysql-connector = "*"
 
 [requires]
 python_version = "3.6"

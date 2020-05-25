@@ -9,18 +9,30 @@
     The Classes :
     -------------
 
-    *Product : The basic product class, will store the required informations.
+    *Products : The basic product class, will store the required informations.
     *Categories : Every product needs at least one category. We'll save all of
         them in that class.
     *Stores : Will save the different stores
-    *Substitute : A very similar class to Products. Will be used to save the
-        user's favourite healthier products.
+    *Substitute : A class linking two products : the basic product and the healthier one.
+    *Buyable : this class represents the buyable table, making the link between
+        a Product and the stores when it can be bought.
+    *Categorized : this is another class wich make a link, between a Product
+        and the Categories in which it can be found.
+    
 
 """
+
+#  Pypi Library
 import peewee as p
 
+class DataBase(p.Model):
+    """
+        Database Classe, will links the tables to the database.
+    """
+    class Meta:
+       # database = A faire !
 
-class Product (p.Model):
+class Products (DataBase):
     """
         The Product Class will define the database Product table. We'll store
         the minimum required informations. If an attribute can be empty, it
@@ -29,85 +41,102 @@ class Product (p.Model):
         Attributes :
         ------------
 
-        :self.code (p.BitField(primary_key = True)): The product's barcode. Can be used as primary key.
-        :self.name (p.CharField(100)): The product's name.
-        :self.brand_name (p. CharField(100)): The brand that owne the product.
+        :code (p.BitField(primary_key = True)): The product's barcode. Can be used as primary key.
+        :name (p.CharField(100)): The product's name.
+        :brand_name (p. CharField(100)): The brand that owne the product.
             As it's not that important, can be empty.
-        :self.categories_fk (list[p.ForeignKeyField(Categories.id)]): List of
-            every Categories which contains the current product.
-        :self.description (p.TextField()): Descriptionof the product. Can be empty
-        :self.nutriscore (p.CharField(1)): The French nutrition grade. Must be
+        :description (p.TextField()): Descriptionof the product. Can be empty
+        :nutriscore (p.CharField(1)): The French nutrition grade. Must be
             in between 'A' and 'E'.
-        :self.url (p.TextField()): The URL to the OpenFoodFacts product page.
-        :self.stores (list[ForeignKeyField(Stores.id)]): The list of the stores
-            where the user can buy the selected product.
-
+        :url (p.TextField()): The URL to the OpenFoodFacts product page.
         Methods :
         ---------
     """
 
-    self.name = p.CharField(100).
-    self.code = p.BitField(primary_key = True, unique = True)
-    self.brand_name = p.CharField(100)
-    self.categories = []
-    self.description = p.TextField()
+    name = p.CharField(100).
+    code = p.BitField(primary_key = True, unique = True)
+    brand_name = p.CharField(100)
+    description = p.TextField()
+    nutriscore = p.CharField(1)
+    url = p.TextField()
 
-    def __init__(self, code, product_name, nutrition_grade_fr, url, *args, **kwargs):
-        self.name = generic_name_fr
+class Categories(DataBase):
+    """
+        The Categories class will gather every food category fom the
+        Categories table. 
 
-    class Categories(p.Model):
-        """
-            The Categories class will gather avery food category fom the
-            Categories table. 
+        Attributes :
+        ------------
 
-            Attributes :
-            ------------
+        :name (CharField(30)): The name of the category.
+        :id (AutoField(primary_key = True)): 
+    """
+    id = AutoField(primary_key = True)
+    name = Charfield(30)
 
-            :self.name (CharField(30)): The name of the category.
-            :self.id (AutoField(primary_key = True)): 
-        """
-        self.id = AutoField(primary_key = True)
-        self.name = Charfield(30)
-        def __init__ (self,nom_mag ):
-            self.id = AutoField(primary_key = True)
-            self.name = nom_mag.upper() # Métaclasse + décorateur ?
+class Stores (DataBase):
+    """
+        The Stores Class will gather every store of the database
+        (represents the Stores table) where a product is buyable.
 
-    class Stores (p.Model):
-        """
-            The Stores Class will gather every store of the database
-            (represents the Stores table) where a product is buyable.
+        Attriutes :
+        -----------
 
-            Attriutes :
-            -----------
+        :name (p.CharField(30)): Name of the Store
+        :id (p.AutoField(primary_key= True)):
+    """
 
-            :self.name (p.CharField(30)): Name of the Store
-            :self.id (p.AutoField(primary_key= True)):
-        """
-    
-    class Substitute (p.Model):
-        """
-            Similar to the Product Class, it will define the database
-            Substitute table. We take 'Product' as model and add a reference to
-            the original, less healthy product. -> MOTHER CLASS ??
-            If an attribute can be empty, it will be mentionned.
+    name = p.CharField(30)
+    id = p.AutoField(primary_key = True)
 
-            Attributes :
-            ------------
+class Substitutes (DataBase):
+    """
+        Links (n:n) a basic product to a healthier product (comparison based on
+            nutriscore)
 
-            :self.code (p.BitField(primary_key = True)): The product's barcode. Can be used as primary key.
-            :self.name (p.CharField(100)): The product's name.
-            :self.brand_name (p. CharField(100)): The brand that owne the product.
-                As it's not that important, can be empty.
-            :self.categories_fk (list[p.ForeignKeyField(Categories.id)]): List of
-                every Categories which contains the current product.
-            :self.description (p.TextField()): Descriptionof the product. Can be empty
-            :self.nutriscore (p.CharField(1)): The French nutrition grade. Must be
-                in between 'A' and 'E'.
-            :self.url (p.TextField()): The URL to the OpenFoodFacts product page.
-            :self.stores (list[ForeignKeyField(Stores.id)]): The list of the stores
-                where the user can buy the selected product.
-            :self.fk_product (ForeignKeyField(Product.name))
+        Attributes :
+        ------------
 
-            Methods :
-            ---------
-        """
+        :fk_base_product (p.ForeignKeyField(Product)): The base product in
+            the Products table
+        :fk_healthier_product (p.ForeignKeyField(Product)): The healthier
+        product (has a batter nutrition_grade_fr) in the Products table
+
+        Methods :
+        ---------
+    """
+    fk_base_product = p.ForeignKeyField(Product)
+    fk_healthier_product = p.ForeignKeyField(Product)
+
+class Categorized (DataBase):
+    """
+        Links (n:n) a product to a category.
+
+        Attributes :
+        ------------
+
+        :fk_product (p.ForeignKeyField(Product)): The product from the Products
+            table
+        :fk_category (p.ForeignKeyField(Category)): The category containing the
+            product.
+
+        Methods :
+        ---------
+    """
+    fk_product = p.ForeignKeyField(Product)
+    fk_category = p.ForeignKeyField(Category)
+
+class Buyable (DataBase):
+    """
+        Links (n:n) a product to a store where it can be sold.
+
+        Attributes :
+        ------------
+
+        :fk_product (p.ForeignKeyField(Product)): The product from the Products
+            table
+        :fk_store (p.ForeignKeyField(Store)): The store selling the product.
+    """
+
+    fk_product = p.ForeignKeyField(Product)
+    fk_store = p.ForeignKeyField(Store)
