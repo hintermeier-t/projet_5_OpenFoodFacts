@@ -1,10 +1,12 @@
+# coding: utf-8
+
 """
     THE ``tables`` MODULE
     =====================
 
     Will be used as an interface between the Database and the Python Program.
     In this module, each class corresponds to a table. Each class attribute is
-    a column on th table. Each class instance is a row in the table.
+    a column on the table. Each class instance is a row in the table.
 
     The Classes :
     -------------
@@ -22,15 +24,20 @@
 
 """
 
-#  Pypi Library
+#-  Pypi Library
 import peewee as p
 
+#-  Custom Library
+import config as c
 class DataBase(p.Model):
     """
         Database Classe, will links the tables to the database.
     """
+    
     class Meta:
-       # database = A faire !
+        configuration = c.Configuration()
+        database = p.MySQLDatabase("openfoodfacts", host="127.0.0.1", user=configuration.user, passwd=configuration.password)
+        database.connect()
 
 class Products (DataBase):
     """
@@ -53,7 +60,7 @@ class Products (DataBase):
         ---------
     """
 
-    name = p.CharField(100).
+    name = p.CharField(100)
     code = p.BitField(primary_key = True, unique = True)
     brand_name = p.CharField(100)
     description = p.TextField()
@@ -71,8 +78,8 @@ class Categories(DataBase):
         :name (CharField(30)): The name of the category.
         :id (AutoField(primary_key = True)): 
     """
-    id = AutoField(primary_key = True)
-    name = Charfield(30)
+    id = p.AutoField(primary_key = True)
+    name = p.CharField(30)
 
 class Stores (DataBase):
     """
@@ -105,8 +112,8 @@ class Substitutes (DataBase):
         Methods :
         ---------
     """
-    fk_base_product = p.ForeignKeyField(Product)
-    fk_healthier_product = p.ForeignKeyField(Product)
+    fk_base_product = p.ForeignKeyField(Products)
+    fk_healthier_product = p.ForeignKeyField(Products)
 
 class Categorized (DataBase):
     """
@@ -123,8 +130,8 @@ class Categorized (DataBase):
         Methods :
         ---------
     """
-    fk_product = p.ForeignKeyField(Product)
-    fk_category = p.ForeignKeyField(Category)
+    fk_product = p.ForeignKeyField(Products)
+    fk_category = p.ForeignKeyField(Categories)
 
 class Buyable (DataBase):
     """
@@ -138,5 +145,5 @@ class Buyable (DataBase):
         :fk_store (p.ForeignKeyField(Store)): The store selling the product.
     """
 
-    fk_product = p.ForeignKeyField(Product)
-    fk_store = p.ForeignKeyField(Store)
+    fk_product = p.ForeignKeyField(Products)
+    fk_store = p.ForeignKeyField(Stores)

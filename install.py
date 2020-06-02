@@ -1,3 +1,5 @@
+# coding: utf-8
+
 """
     Installation module
     ===================
@@ -27,9 +29,11 @@ import peewee as p
 import requests as r
 
 #  Custom Library
-import tables.py as db
+import tables as tables
 
-
+#Data -> classe DL
+#Cleaning -> nvelle classe
+#save -> nvelle classe
 
 class Data :
     """
@@ -46,19 +50,8 @@ class Data :
             OpenFoodFacts.
         :index (int): store the page number, starts at 1 to MAX_PAGES
     """
-    index = 1
-    #-  URL to restrict to the French products
-    self.request_url = "https://fr.openfoodfacts.org/cgi/search.pl"
-    self.request_params = {
-    "action": "process",
-    #-  We chose the most wanted products
-    "sort_by": "unique_scans_n",
-    "page_size": 20,
-    "page": index,
-    #-  We'll need a json to process the data
-    "json": 1
-    }
-    self.data = []
+
+    
 
     def __init__(self):
         """
@@ -66,6 +59,19 @@ class Data :
             in the data array.
         """
         MAX_PAGES = 10
+        self.data = list()
+        index = 1
+        #-  URL to restrict to the French products
+        self.request_url = "https://fr.openfoodfacts.org/cgi/search.pl"
+        self.request_params = {
+        "action": "process",
+        #-  We chose the most wanted products
+        "sort_by": "unique_scans_n",
+        "page_size": 20,
+        "page": index,
+        #-  We'll need a json to process the data
+        "json": 1
+    }
         try :
             for index in range(MAX_PAGES):
                 print(" {0}%".format(index*(100//MAX_PAGES)))
@@ -74,7 +80,7 @@ class Data :
                 if response.status_code == 200:
                     self.data.extend(response.json()['products'])
 
-        sys.stdout.write("\033[F")  #  Update DL status
+            sys.stdout.write("\033[F")  #  Update DL status
 
         except r.ConnectionError :
             print("Unable to Connect to {0}".format(url))
@@ -92,7 +98,6 @@ class Cleaner :
         :self.cleaned_data (list): list of collected data in the Data Class
 
     """
-    self.cleaned_data = []
 
     def __init__(self, data_to_clean):
         """
@@ -104,68 +109,86 @@ class Cleaner :
 
             :data_to_clean (Data.data): raw list of every products.
         """
-        for i in range (len(data_to_clean)):
+
+        self.cleaned_data = list()
+
+        for data in data_to_clean:
             #- First, we check if the required informations exist.
 
-            if (data_to_clean[i]['code'] and data_to_clean[i]['categories']\
-                and data_to_clean[i]['nutriscore_grade'] and\
-                    self.cleaned_data[i] ['product_name_fr'])is not None:
+            if (data.get('code') and data.get('categories')
+                and data.get('nutriscore_grade') and
+                data.get('product_name_fr')):
+                self.cleaned_data.extend(data)
 
-                    self.cleaned_data.append(data_to_clean[i])
-                    self.cleaned_data[i]['nutriscore_grade'] = \
-                        self.cleaned_data[i]['nutriscore_grade'].upper()
-                    self.cleaned_data[i]['categories'] = self.cleaned_data[i]\
-                        ['categories'].upper()
-                    self.cleaned_data[i]['stores'] = self.cleaned_data[i]\
-                        ['stores'].upper()
-                    
-    def organize (self):
-        """
-            Now that we have proper data, 'organize' will create the tables and
-            save them in the database defined in 'tables.py"
-        """
-        cat = list()
-        products = list()
-        stores = list()
-        tmp_a = list()
-        tmp_b = list()
-        association_cat = list()
-        association_stores = list()
-
-        #-  Extracting all categories and stores
-        for i in range (len(self.cleaned_data)):
-            tmp_a.extend(self.cleaned_data[i]['categories'].split(','))
-            tmp_b.extend(self.cleaned_data[i]['stores'].split(','))
-    
-            #-  Extracting products
-            products.extend(db.Products.create(name = self.cleaned_data[i]\
-                ['product_name_fr'],
-                code = self.cleaned_data[i]['code']
-                brand_name = self.cleaned_data[i] ['brands']
-                nutriscore = self.cleaned_data[i] ['nutriscore_grade_fr']
-                url = self.cleaned_data[i] ['url']
-                description = self.cleaned_data[i] ['generic_name_fr']))
-            products[i].save()
-
-            #-  Creating Categories and Stores tables
-            for j in range(len(tmp_b)):
-                cat[j], created = db.Categories.get_or_create(name = tmp_a[j])
-                cat[j].save()
-            for j in range(len(tmp_a)):
-                stores[j], created = db.Stores.get_or_create(name = tmp_b[j])
-                stores[j].save()
-
-            #-  Last, creating the association tables Buyable and Categorized
-            for j in range(len(cat)):
-                if cat[j] in self.cleaned_data[i]['categories']:
-                    association_cat.extend(db.Categorized(
-                        fk_product = product[i],
-                        fk_category = cat[j]
-                    ))
-            for j in range(len(stores)):
-                if cat[j] in self.cleaned_data[i]['categories']:
-                    association_stores.extend(db.Buyable(
-                        fk_product = product[i],
-                        fk_store = stores[j]
-                    ))
+        for data in self.cleaned_data:
+                    data['nutriscore_grade'] = \
+                        data.get('nutriscore_grade').upper()
+                    data['categories'] = \
+                        data.get('categories').upper()
+                    data['stores'] = \
+                        data.get('stores').upper()
             
+class Saver:
+    """
+        Class saving the Cleaned Data from Cleaner Class.
+
+        Fill the Categories, Stores and Products tables in the Database.
+
+        Attributes:
+        -----------
+
+        :self.categories (list): List of every category name
+        :self.stores (list): List of every store name
+        :self.products(list): List of every product
+
+        Methods:
+        --------
+
+        :__init(self, data_list): The init method will create the basic tables.
+        :associate (self): Will create the 2 association tables
+    """
+
+    def __init__(self, data_list):
+        """
+            The __init__ Method, will save the basic tables : Products,
+            Categories and Stores/
+        """
+        self.categories = list()
+        self.stores = list()
+        self.products = list()
+
+        for data in data_list:
+            self.categories.extend(data.get('categories').split(','))
+            self.stores.extend(data.get('stores').split(','))
+            self.products.extend(tables.Products.create(
+                name = data.get('product_name_fr'),
+                code = data.get('code'),
+                brand_name = data.get('brands'),
+                nutriscore = data.get('nutriscore_grade_fr'),
+                url = data.get('url'),
+                description = data.get('generic_name_fr')))
+
+        for category in self.categories:
+            new_category, created = tables.Categories.get_or_create(\
+                name = category)
+
+        for store in self.stores:
+            new_store, created = tables.Stores.get_or_create(name = store)
+
+    def associate (self):
+
+        for product in self.products:
+
+            for category in self.categories:
+                if category in product:
+                    categorized, created = tables.Categorized.get_or_create(
+                        fk_product = product,
+                        fk_store = store
+                        )
+
+            for store in self.stores:
+                if store in product:
+                    buyable, created = tables.Buyable.get_or_create(
+                        fk_product = product,
+                        fk_store = store
+                    )
