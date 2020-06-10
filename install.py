@@ -31,9 +31,6 @@ import requests as r
 #  Custom Library
 import tables as tables
 
-#Data -> classe DL
-#Cleaning -> nvelle classe
-#save -> nvelle classe
 
 class Data :
     """
@@ -77,10 +74,10 @@ class Data :
                 print(" {0}%".format(index*(100//MAX_PAGES)))
                 response = r.get(self.request_url, self.request_params)
 
-                if response.status_code == 200:
+                if response.status_code == 200: #-  if success
                     self.data.extend(response.json()['products'])
 
-            sys.stdout.write("\033[F")  #  Update DL status
+                sys.stdout.write("\033[F")  #-  Update screen
 
         except r.ConnectionError :
             print("Unable to Connect to {0}".format(url))
@@ -115,18 +112,13 @@ class Cleaner :
         for data in data_to_clean:
             #- First, we check if the required informations exist.
 
-            if (data.get('code') and data.get('categories')
-                and data.get('nutriscore_grade') and
-                data.get('product_name_fr')):
-                self.cleaned_data.extend(data)
+            if (data.get('code') and data.get('categories') and data.get('nutriscore_grade') and data.get('product_name_fr')):
+                self.cleaned_data.append(data)
 
         for data in self.cleaned_data:
-                    data['nutriscore_grade'] = \
-                        data.get('nutriscore_grade').upper()
-                    data['categories'] = \
-                        data.get('categories').upper()
-                    data['stores'] = \
-                        data.get('stores').upper()
+                    data['nutriscore_grade'] = data.get('nutriscore_grade').upper()
+                    data['categories'] = data.get('categories').upper()
+                    data['stores'] = data.get('stores').upper()
             
 class Saver:
     """
@@ -160,13 +152,14 @@ class Saver:
         for data in data_list:
             self.categories.extend(data.get('categories').split(','))
             self.stores.extend(data.get('stores').split(','))
-            self.products.extend(tables.Products.create(
+            product = tables.Products.create(
                 name = data.get('product_name_fr'),
                 code = data.get('code'),
                 brand_name = data.get('brands'),
-                nutriscore = data.get('nutriscore_grade_fr'),
+                nutriscore = data.get('nutriscore_grade'),
                 url = data.get('url'),
-                description = data.get('generic_name_fr')))
+                description = data.get('generic_name_fr'))
+            self.products.append(product)
 
         for category in self.categories:
             new_category, created = tables.Categories.get_or_create(\

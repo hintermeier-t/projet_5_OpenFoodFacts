@@ -29,17 +29,18 @@ import peewee as p
 
 #-  Custom Library
 import config as c
-class DataBase(p.Model):
+
+configuration = c.Configuration()
+db = p.MySQLDatabase("openfoodfacts", host=configuration.host, user=configuration.user, passwd=configuration.password)
+
+class Database(p.Model):
     """
         Database Classe, will links the tables to the database.
     """
-    
     class Meta:
-        configuration = c.Configuration()
-        database = p.MySQLDatabase("openfoodfacts", host="127.0.0.1", user=configuration.user, passwd=configuration.password)
-        database.connect()
+        database = db
 
-class Products (DataBase):
+class Products (Database):
     """
         The Product Class will define the database Product table. We'll store
         the minimum required informations. If an attribute can be empty, it
@@ -59,15 +60,15 @@ class Products (DataBase):
         Methods :
         ---------
     """
-
+    id = p.AutoField(primary_key = True, unique = True)
     name = p.CharField(100)
-    code = p.BitField(primary_key = True, unique = True)
+    code = p.BitField()
     brand_name = p.CharField(100)
     description = p.TextField()
     nutriscore = p.CharField(1)
     url = p.TextField()
 
-class Categories(DataBase):
+class Categories(Database):
     """
         The Categories class will gather every food category fom the
         Categories table. 
@@ -81,7 +82,7 @@ class Categories(DataBase):
     id = p.AutoField(primary_key = True)
     name = p.CharField(30)
 
-class Stores (DataBase):
+class Stores (Database):
     """
         The Stores Class will gather every store of the database
         (represents the Stores table) where a product is buyable.
@@ -96,7 +97,7 @@ class Stores (DataBase):
     name = p.CharField(30)
     id = p.AutoField(primary_key = True)
 
-class Substitutes (DataBase):
+class Substitutes (Database):
     """
         Links (n:n) a basic product to a healthier product (comparison based on
             nutriscore)
@@ -115,7 +116,7 @@ class Substitutes (DataBase):
     fk_base_product = p.ForeignKeyField(Products)
     fk_healthier_product = p.ForeignKeyField(Products)
 
-class Categorized (DataBase):
+class Categorized (Database):
     """
         Links (n:n) a product to a category.
 
@@ -133,7 +134,7 @@ class Categorized (DataBase):
     fk_product = p.ForeignKeyField(Products)
     fk_category = p.ForeignKeyField(Categories)
 
-class Buyable (DataBase):
+class Buyable (Database):
     """
         Links (n:n) a product to a store where it can be sold.
 
@@ -144,6 +145,6 @@ class Buyable (DataBase):
             table
         :fk_store (p.ForeignKeyField(Store)): The store selling the product.
     """
-
+    
     fk_product = p.ForeignKeyField(Products)
     fk_store = p.ForeignKeyField(Stores)

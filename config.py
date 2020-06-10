@@ -12,6 +12,7 @@ class Configuration:
     def __init__(self):
         self._user = input("Entrez votre User MySQL: ")
         self._password = getpass.getpass("Entrez votre mot de passe MySQL: ")
+        self._host = "127.0.0.1"
 
     @property
     def user(self):
@@ -20,3 +21,7 @@ class Configuration:
     @property
     def password(self):
         return self._password
+
+    @property
+    def host(self):
+        return self._host
