@@ -71,12 +71,12 @@ class Data :
     }
         try :
             for index in range(MAX_PAGES):
-                print(" {0}%".format(index*(100//MAX_PAGES)))
+                
                 response = r.get(self.request_url, self.request_params)
-
                 if response.status_code == 200: #-  if success
                     self.data.extend(response.json()['products'])
-
+                    print(" {0}%".format(index*(100//MAX_PAGES)))
+                
                 sys.stdout.write("\033[F")  #-  Update screen
 
         except r.ConnectionError :
@@ -168,20 +168,21 @@ class Saver:
         for store in self.stores:
             new_store, created = tables.Stores.get_or_create(name = store)
 
-    def associate (self):
-
-        for product in self.products:
-
+    def associate (self, data_list):
+        i = 0
+        for data in data_list:
+            print(i)
+            i += 1
             for category in self.categories:
-                if category in product:
+                if category in data.get('categories'):
                     categorized, created = tables.Categorized.get_or_create(
-                        fk_product = product,
-                        fk_store = store
+                        fk_product = tables.Products.get(tables.Products.code == data.get('code')),
+                        fk_category = tables.Categories.get(tables.Categories.name == category)
                         )
 
             for store in self.stores:
-                if store in product:
+                if store in data.get('stores'):
                     buyable, created = tables.Buyable.get_or_create(
-                        fk_product = product,
-                        fk_store = store
+                        fk_product = tables.Products.get(tables.Products.code == data.get('code')),
+                        fk_store = tables.Stores.get(tables.Stores.name == store)
                     )

@@ -20,6 +20,7 @@ def main ():
         db.create_tables([tables.Products, tables.Categories, tables.Stores, tables.Categorized, tables.Buyable, tables.Substitutes])
         clean_data = install.Cleaner(raw_data.data)
         save = install.Saver(clean_data.cleaned_data)
+        save.associate(clean_data.cleaned_data)
         db.close()
 
     db.connect()

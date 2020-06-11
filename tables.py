@@ -80,7 +80,7 @@ class Categories(Database):
         :id (AutoField(primary_key = True)): 
     """
     id = p.AutoField(primary_key = True)
-    name = p.CharField(30)
+    name = p.CharField(50)
 
 class Stores (Database):
     """
@@ -94,7 +94,7 @@ class Stores (Database):
         :id (p.AutoField(primary_key= True)):
     """
 
-    name = p.CharField(30)
+    name = p.CharField(50)
     id = p.AutoField(primary_key = True)
 
 class Substitutes (Database):
@@ -131,7 +131,7 @@ class Categorized (Database):
         Methods :
         ---------
     """
-    fk_product = p.ForeignKeyField(Products)
+    fk_product = p.ForeignKeyField(Products, backref='Categories')
     fk_category = p.ForeignKeyField(Categories)
 
 class Buyable (Database):
@@ -146,5 +146,5 @@ class Buyable (Database):
         :fk_store (p.ForeignKeyField(Store)): The store selling the product.
     """
     
-    fk_product = p.ForeignKeyField(Products)
+    fk_product = p.ForeignKeyField(Products, backref="Stores")
     fk_store = p.ForeignKeyField(Stores)
