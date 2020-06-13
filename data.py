@@ -1,12 +1,12 @@
+import peewee
+from peewee import fn
 import random
 import tables
 
 
 class Data_categories:
-    def __init__(self, Categories):
-        self.data = dict()
-        for categorie in Categories.select():
-            self.data.update({Categories.id:Categories.name})
+    def __init__(self):
+        print(tables.Categories.select().order_by(fn.Rand()).limit(5))
     
     def display (self):
         for cat in self.data :

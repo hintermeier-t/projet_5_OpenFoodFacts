@@ -3,7 +3,6 @@ import data
 class Application:
 
     def __init__(self, Categories):
-        self.cat = Categories
         self._next = "accueil"
         self.menu = "Voici la liste des commandes de menu :\n\
             1. accueil - Menu d'Accueil\n\
@@ -11,35 +10,34 @@ class Application:
             4. favoris - Afficher les produits sauvegardés et leurs substituts\n\
             5. quitter - Quitte l'Application"
     def choice(self, rep):
-            while rep.startswith("__") or rep not in vars(Application)\
+            if rep.startswith("__") or rep not in vars(Application)\
                 or rep == "":
                 return True
 
     def accueil(self, **args):
         print("Bienvenue dans le programme de Recherche d'Aliments Saint")
         print(self.menu)
-        reponse = ""
-        while self.choice(reponse):
-            reponse = input("Où désirez-vous aller ? ")
-        if not reponse.startswith("__") and reponse in vars(Application):
-            return reponse.strip(), {"key1": "value1", "key2": "value2"}
+        self.reponse = ""
+        while self.choice(self.reponse):
+            self.reponse = input("Où désirez-vous aller ? ")
+        if not self.reponse.startswith("__") and self.reponse in vars(Application):
+            return self.reponse.strip(), {"key1": "value1", "key2": "value2"}
 
     def categories(self, **args):
         print(self.menu)
-        categories_dict = data.Data_categories(self.cat)
-        selection = categories_dict.select(5)
+        selection = data.Data_categories()
         print(selection)
-        while self.choice(reponse) or reponse not in selection.keys():
-            reponse = input("Sélectionnez une catégorie ou un menu : ")
-        if not reponse.startswith("__") and reponse in vars(Application):
-            return reponse.strip(), {"key1": "value1", "key2": "value2"}
+        while self.choice(self.reponse):
+            self.reponse = input("Sélectionnez une catégorie ou un menu : ")
+        if not self.reponse.startswith("__") and self.reponse in vars(Application):
+            return self.reponse.strip(), {"key1": "value1", "key2": "value2"}
         
 
     def favoris (self, **args):
         print(self.menu)
-        reponse = input("Où désirez-vous aller ? ")
-        if not reponse.startswith("__") and reponse in vars(Application):
-            return reponse.strip(), args
+        self.reponse = input("Où désirez-vous aller ? ")
+        if not self.reponse.startswith("__") and self.reponse in vars(Application):
+            return self.reponse.strip(), args
 
     def quitter(self, **args):
         print("Fin du programme")

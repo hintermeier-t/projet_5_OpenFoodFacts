@@ -75,9 +75,8 @@ class Data :
                 response = r.get(self.request_url, self.request_params)
                 if response.status_code == 200: #-  if success
                     self.data.extend(response.json()['products'])
-                    print(" {0}%".format(index*(100//MAX_PAGES)))
-                
-                sys.stdout.write("\033[F")  #-  Update screen
+                    print("Downloading: {0}%".format(index*(100//MAX_PAGES)))
+                    sys.stdout.write("\033[F")  #-  Update screen
 
         except r.ConnectionError :
             print("Unable to Connect to {0}".format(url))
@@ -150,6 +149,7 @@ class Saver:
         self.products = list()
 
         for data in data_list:
+
             self.categories.extend(data.get('categories').split(','))
             self.stores.extend(data.get('stores').split(','))
             product = tables.Products.create(
@@ -162,17 +162,18 @@ class Saver:
             self.products.append(product)
 
         for category in self.categories:
+
             new_category, created = tables.Categories.get_or_create(\
                 name = category)
 
         for store in self.stores:
+
             new_store, created = tables.Stores.get_or_create(name = store)
 
     def associate (self, data_list):
-        i = 0
+ 
         for data in data_list:
-            print(i)
-            i += 1
+
             for category in self.categories:
                 if category in data.get('categories'):
                     categorized, created = tables.Categorized.get_or_create(
@@ -181,6 +182,7 @@ class Saver:
                         )
 
             for store in self.stores:
+                
                 if store in data.get('stores'):
                     buyable, created = tables.Buyable.get_or_create(
                         fk_product = tables.Products.get(tables.Products.code == data.get('code')),
