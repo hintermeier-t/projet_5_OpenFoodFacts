@@ -131,7 +131,7 @@ class Categorized (Database):
         Methods :
         ---------
     """
-    fk_product = p.ForeignKeyField(Products, backref='Categories')
+    fk_product = p.ForeignKeyField(Products)
     fk_category = p.ForeignKeyField(Categories)
 
 class Buyable (Database):
