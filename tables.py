@@ -24,14 +24,16 @@
 
 """
 
-#-  Pypi Library
+# -  Pypi Library
 import peewee as p
 
-#-  Custom Library
+# -  Custom Library
 import config as c
 
 configuration = c.Configuration()
-db = p.MySQLDatabase("openfoodfacts", host=configuration.host, user=configuration.user, passwd=configuration.password)
+db = p.MySQLDatabase("openfoodfacts", host=configuration.host,
+                     user=configuration.user, passwd=configuration.password)
+
 
 class Database(p.Model):
     """
@@ -39,6 +41,7 @@ class Database(p.Model):
     """
     class Meta:
         database = db
+
 
 class Products (Database):
     """
@@ -60,13 +63,14 @@ class Products (Database):
         Methods :
         ---------
     """
-    id = p.AutoField(primary_key = True, unique = True)
+    id = p.AutoField(primary_key=True, unique=True)
     name = p.CharField(100)
     code = p.BitField()
     brand_name = p.CharField(100)
     description = p.TextField()
     nutriscore = p.CharField(1)
     url = p.TextField()
+
 
 class Categories(Database):
     """
@@ -79,8 +83,9 @@ class Categories(Database):
         :name (CharField(30)): The name of the category.
         :id (AutoField(primary_key = True)): 
     """
-    id = p.AutoField(primary_key = True)
+    id = p.AutoField(primary_key=True)
     name = p.CharField(50)
+
 
 class Stores (Database):
     """
@@ -95,7 +100,8 @@ class Stores (Database):
     """
 
     name = p.CharField(50)
-    id = p.AutoField(primary_key = True)
+    id = p.AutoField(primary_key=True)
+
 
 class Substitutes (Database):
     """
@@ -116,6 +122,7 @@ class Substitutes (Database):
     fk_base_product = p.ForeignKeyField(Products)
     fk_healthier_product = p.ForeignKeyField(Products)
 
+
 class Categorized (Database):
     """
         Links (n:n) a product to a category.
@@ -134,6 +141,7 @@ class Categorized (Database):
     fk_product = p.ForeignKeyField(Products)
     fk_category = p.ForeignKeyField(Categories)
 
+
 class Buyable (Database):
     """
         Links (n:n) a product to a store where it can be sold.
@@ -145,6 +153,6 @@ class Buyable (Database):
             table
         :fk_store (p.ForeignKeyField(Store)): The store selling the product.
     """
-    
+
     fk_product = p.ForeignKeyField(Products, backref="Stores")
     fk_store = p.ForeignKeyField(Stores)

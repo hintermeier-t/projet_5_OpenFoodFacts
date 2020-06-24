@@ -32,7 +32,8 @@ import requests as r
 import tables as tables
 
 
-class Data :
+class Data:
+
     """
         Class used to send the request to OpenFoodfacts, and store the response
         in an array.
@@ -48,40 +49,41 @@ class Data :
         :index (int): store the page number, starts at 1 to MAX_PAGES
     """
 
-    
-
     def __init__(self):
+
         """
-            The initiation method, just send the request and store the response
+            The __init__ method, just send the request and stores the response
             in the data array.
         """
+
         MAX_PAGES = 10
         self.data = list()
         index = 1
-        #-  URL to restrict to the French products
+        # -  URL to restrict to the French products
         self.request_url = "https://fr.openfoodfacts.org/cgi/search.pl"
         self.request_params = {
-        "action": "process",
-        #-  We chose the most wanted products
-        "sort_by": "unique_scans_n",
-        "page_size": 20,
-        "page": index,
-        #-  We'll need a json to process the data
-        "json": 1
-    }
-        try :
+            "action": "process",
+            # -  We chose the most wanted products
+            "sort_by": "unique_scans_n",
+            "page_size": 20,
+            "page": index,
+            # -  We'll need a json to process the data
+            "json": 1
+        }
+        try:
             for index in range(MAX_PAGES):
-                
+
                 response = r.get(self.request_url, self.request_params)
-                if response.status_code == 200: #-  if success
+                if response.status_code == 200:  # -  if success
                     self.data.extend(response.json()['products'])
                     print("Downloading: {0}%".format(index*(100//MAX_PAGES)))
-                    sys.stdout.write("\033[F")  #-  Update screen
+                    sys.stdout.write("\033[F")  # -  Update screen
 
-        except r.ConnectionError :
+        except r.ConnectionError:
             print("Unable to Connect to {0}".format(url))
 
-class Cleaner :
+
+class Cleaner:
     """
         Class that will gather the data we want about the product, in order to
         save in the DB only the products with all the required informations.
@@ -102,23 +104,23 @@ class Cleaner :
 
             Args :
             ------
-
             :data_to_clean (Data.data): raw list of every products.
         """
 
         self.cleaned_data = list()
 
         for data in data_to_clean:
-            #- First, we check if the required informations exist.
+            # - First, we check if the required informations exist.
 
             if (data.get('code') and data.get('categories') and data.get('nutriscore_grade') and data.get('product_name_fr')):
                 self.cleaned_data.append(data)
 
         for data in self.cleaned_data:
-                    data['nutriscore_grade'] = data.get('nutriscore_grade').upper()
-                    data['categories'] = data.get('categories').upper()
-                    data['stores'] = data.get('stores').upper()
-            
+            data['nutriscore_grade'] = data.get('nutriscore_grade').upper()
+            data['categories'] = data.get('categories').upper()
+            data['stores'] = data.get('stores').upper()
+
+
 class Saver:
     """
         Class saving the Cleaned Data from Cleaner Class.
@@ -140,10 +142,16 @@ class Saver:
     """
 
     def __init__(self, data_list):
+
         """
             The __init__ Method, will save the basic tables : Products,
-            Categories and Stores/
+            Categories and Stores.
+
+            Arg:
+            ----
+            :data_list (list): raw data extracted from json.
         """
+
         self.categories = list()
         self.stores = list()
         self.products = list()
@@ -153,38 +161,50 @@ class Saver:
             self.categories.extend(data.get('categories').split(','))
             self.stores.extend(data.get('stores').split(','))
             product = tables.Products.create(
-                name = data.get('product_name_fr'),
-                code = data.get('code'),
-                brand_name = data.get('brands'),
-                nutriscore = data.get('nutriscore_grade'),
-                url = data.get('url'),
-                description = data.get('generic_name_fr'))
+                name=data.get('product_name_fr'),
+                code=data.get('code'),
+                brand_name=data.get('brands'),
+                nutriscore=data.get('nutriscore_grade'),
+                url=data.get('url'),
+                description=data.get('generic_name_fr'))
             self.products.append(product)
 
         for category in self.categories:
 
-            new_category, created = tables.Categories.get_or_create(\
-                name = category)
+            new_category, created = tables.Categories.get_or_create(
+                name=category)
 
         for store in self.stores:
 
-            new_store, created = tables.Stores.get_or_create(name = store)
+            new_store, created = tables.Stores.get_or_create(name=store)
 
-    def associate (self, data_list):
- 
+    def associate(self, data_list):
+
+        """
+            The associate method create both Categorized and Buyable
+            association tables.
+
+            Arg:
+            ----
+            :data_list (list): raw data extracted from json.
+        """
+
         for data in data_list:
 
             for category in self.categories:
                 if category in data.get('categories'):
                     categorized, created = tables.Categorized.get_or_create(
-                        fk_product = tables.Products.get(tables.Products.code == data.get('code')),
-                        fk_category = tables.Categories.get(tables.Categories.name == category)
-                        )
+                        fk_product=tables.Products.get(
+                            tables.Products.code == data.get('code')),
+                        fk_category=tables.Categories.get(
+                            tables.Categories.name == category)
+                    )
 
             for store in self.stores:
-                
+
                 if store in data.get('stores'):
                     buyable, created = tables.Buyable.get_or_create(
-                        fk_product = tables.Products.get(tables.Products.code == data.get('code')),
-                        fk_store = tables.Stores.get(tables.Stores.name == store)
+                        fk_product=tables.Products.get(
+                            tables.Products.code == data.get('code')),
+                        fk_store=tables.Stores.get(tables.Stores.name == store)
                     )
