@@ -16,10 +16,10 @@
         Substitutes table. (In fact displays the products informations).
 """
 
-# - Pypi module
+#- Pypi module
 from peewee import fn
 
-# - Custom module
+#- Custom module
 import tables as tables
 
 
