@@ -36,7 +36,7 @@ class Application:
         self.menu = "Voici la liste des commandes de menu :\n\
             * accueil - Menu d'Accueil\n\
             * categories - Rechercher par catégories de produits\n\
-            * favoris - Afficher les produits sauvegardés et leurs substituts\n\
+            * favoris - Afficher les produits sauvés et leurs substituts\n\
             * quitter - Quitte l'Application"
 
     def choice(self, rep):
@@ -47,7 +47,7 @@ class Application:
         if rep.startswith("__") or rep not in vars(Application)\
                 or rep == "":
             return True
-
+ 
     def enregistrement(self, cat, **args):# limiter
 
         """

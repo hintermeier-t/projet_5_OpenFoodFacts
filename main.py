@@ -26,7 +26,7 @@ def main():
         db.close()
 
     db.connect()
-    appli = app.Application(tables.Categories)
+    appli = app.Application()
     appli.start()
     db.close()
 

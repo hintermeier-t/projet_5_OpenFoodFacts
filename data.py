@@ -16,15 +16,14 @@
         Substitutes table. (In fact displays the products informations).
 """
 
-#- Pypi module
+# Pypi module
 from peewee import fn
 
-#- Custom module
+# Custom module
 import tables as tables
 
 
 class Data_categories:
-
     """
     The Data_categories class selects 5 random rows from the Categories
     table and allows the user to select one.
@@ -40,20 +39,18 @@ class Data_categories:
     :select(self): Ask the use to chose one of the 5 categories, or pass
         the choice.
     """
-
     def __init__(self):
-        
+
         """
             The __init__ method send the query and save it in self.data
 
             SQL :
-                SELECT * FROM Categories  
-                ORDER BY RAND ()  
+                SELECT * FROM Categories
+                ORDER BY RAND ()
                 LIMIT 5;
         """
 
         self.data = tables.Categories.select().order_by(fn.Rand()).limit(5)
-
     def display(self):
 
         """
@@ -62,22 +59,21 @@ class Data_categories:
 
         for cat in self.data:
             print("ID :", cat.id, " Nom : ", cat.name)
-
     def select(self):
 
         """
             The select method ask the user to chose one of the 5 categories
         """
-
         reponse = ""
         while reponse != 'p' and reponse not in self.data:
             reponse = input(
                 "Choisissez une des catégories en entrant son ID (ou"
                 "  entrez \"p\" pour revenir à l'affichage du menu: "
             )
-            if reponse != 'p':
+            if reponse == 'p':
+                return 0
+            else:
                 return reponse
-        pass
 
 
 class Data_substitution:
@@ -108,7 +104,7 @@ class Data_substitution:
         """
             The __init__ method. Send the query and save it into self.prod.
 
-            SQL query : 
+            SQL query :
                     SELECT * FROM Products
                     JOIN Categorized
                     WHERE (Products.id = Categorized.fk_product_id
@@ -134,7 +130,7 @@ class Data_substitution:
 
             Returns :
             ---------
-            An input (int). The chosen product to substitutes. 
+            An input (int). The chosen product to substitutes.
 
         """
         for produit in self.prod:
@@ -150,7 +146,7 @@ class Data_substitution:
                 "\n\n\n",
             )
             return input(
-                "Veuillez sélectionner l'ID d'un produit pour trouver un substitut"
+                "Sélectionner l'ID d'un produit pour trouver un substitut"
             )
 
     def select(self, product_id):
@@ -162,7 +158,7 @@ class Data_substitution:
             ---------
             :product_id (int): the ID of the product to substitute. The
                 complete row is saved in 'ref'.
-            
+
             SQL:
             SELECT * FROM Products
             WHERE Products.id IN (
@@ -196,7 +192,7 @@ class Data_substitution:
         self.final_query = tables.Products.select().where(
             tables.Products.id.in_(prod_comp)
             & tables.Products.nutriscore.in_(ref_ns)
-        )
+        ).limit(15)
 
         if self.final_query.exists():
             for produit in self.final_query:
@@ -230,7 +226,7 @@ class Data_substitution:
                 "  entrez \"p\" pour revenir à l'affichage du menu: "
             )
             if reponse == 'p':
-                break
+                return 0
             else:
                 tables.Substitutes.get_or_create(
                     fk_base_product=tables.Products.get(
@@ -266,7 +262,7 @@ class Data_favorites:
             The __init__ method. Selects and display the products from the
             Substitutes table.
 
-            First, it queries the Substitutes table to get all the rows. Then, 
+            First, it queries the Substitutes table to get all the rows. Then,
             it queries every product related to the foreign keys and displays
             it.
         """

@@ -118,7 +118,7 @@ class Cleaner:
         for data in self.cleaned_data:
             data['nutriscore_grade'] = data.get('nutriscore_grade').upper()
             data['categories'] = data.get('categories').upper()
-            data['stores'] = data.get('stores').upper()
+            data['stores'] =  data.get('stores').upper()
 
 
 class Saver:
@@ -158,8 +158,8 @@ class Saver:
 
         for data in data_list:
 
-            self.categories.extend(data.get('categories').split(','))
-            self.stores.extend(data.get('stores').split(','))
+            self.categories.extend([cat.strip() for cat in data.get('categories').split(',')])
+            self.stores.extend([store.strip() for store in data.get('stores').split(',')])
             product = tables.Products.create(
                 name=data.get('product_name_fr'),
                 code=data.get('code'),
@@ -179,7 +179,6 @@ class Saver:
             new_store, created = tables.Stores.get_or_create(name=store)
 
     def associate(self, data_list):
-
         """
             The associate method create both Categorized and Buyable
             association tables.
@@ -190,21 +189,26 @@ class Saver:
         """
 
         for data in data_list:
-
             for category in self.categories:
-                if category in data.get('categories'):
+                if category in [dat.strip() for dat in data.get('categories').split(',')]:
                     categorized, created = tables.Categorized.get_or_create(
                         fk_product=tables.Products.get(
                             tables.Products.code == data.get('code')),
                         fk_category=tables.Categories.get(
-                            tables.Categories.name == category)
+                            tables.Categories.name == category.strip())
                     )
-
             for store in self.stores:
-
-                if store in data.get('stores'):
+                if store in data.get('stores').split(','):
                     buyable, created = tables.Buyable.get_or_create(
                         fk_product=tables.Products.get(
                             tables.Products.code == data.get('code')),
                         fk_store=tables.Stores.get(tables.Stores.name == store)
                     )
+
+
+
+"""
+
+
+
+"""
