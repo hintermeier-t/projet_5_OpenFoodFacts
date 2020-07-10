@@ -7,12 +7,12 @@
     The Classes :
     -------------
 
-    *Data_categories : Will select 5 random categories and permit to select
+    *DataCategories : Will select 5 random categories and permit to select
         one.
-    *Data_substitution : This class links the categories to the products. it is
+    *DataSubstitution : This class links the categories to the products. it is
         designed to select a product in a given category, and select all the
         related products with better nutriscore.
-    *Data_substitutes : Used to select and display every saved row of the
+    *DataFavorites : Used to select and display every saved row of the
         Substitutes table. (In fact displays the products informations).
 """
 
@@ -23,7 +23,7 @@ from peewee import fn
 import tables as tables
 
 
-class Data_categories:
+class DataCategories:
     """
     The Data_categories class selects 5 random rows from the Categories
     table and allows the user to select one.
@@ -76,7 +76,7 @@ class Data_categories:
                 return reponse
 
 
-class Data_substitution:
+class DataSubstitution:
 
     """
         The Data_substitution class links the selected category with the
@@ -134,7 +134,7 @@ class Data_substitution:
 
         """
         for produit in self.prod:
-            print(
+            print("\n",
                 "ID: ",
                 produit.id,
                 "\tNOM: ",
@@ -142,8 +142,7 @@ class Data_substitution:
                 "\tMARQUE: ",
                 produit.brand_name,
                 "\tNUTRISCORE: ",
-                produit.nutriscore,
-                "\n",
+                produit.nutriscore
             )
         choix = input(
             "Sélectionner l'ID d'un produit pour trouver un substitut ou\
@@ -245,7 +244,7 @@ class Data_substitution:
         return 0
 
 
-class Data_favorites:
+class DataFavorites:
 
     """
         The Data_favorites class will query the database to select every

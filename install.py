@@ -25,6 +25,7 @@ import sys
 import os
 
 #  Pypi Libraries
+import dotenv
 import peewee as p
 import requests as r
 
@@ -50,25 +51,23 @@ class Data:
     """
 
     def __init__(self):
-
         """
             The __init__ method, just send the request and stores the response
             in the data array.
         """
-
-        MAX_PAGES = 10
+        dotenv.load_dotenv() #- Loading .env file
         self.data = list()
         index = 1
         # -  URL to restrict to the French products
         self.request_url = "https://fr.openfoodfacts.org/cgi/search.pl"
         
         try:
-            for index in range(MAX_PAGES):
+            for index in range(os.getenv("P_MAX_PAGES")):
                 self.request_params = {
             "action": "process",
             # -  We chose the most wanted products
             "sort_by": "unique_scans_n",
-            "page_size": 20,
+            "page_size": os.getenv("P_PAGE_SIZE"),
             "page": index+1,
             # -  We'll need a json to process the data
             "json": 1

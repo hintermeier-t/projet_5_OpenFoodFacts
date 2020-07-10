@@ -54,7 +54,7 @@ class Application:
             The enregistrement sub-menu links a product to its substitutes.
         """
 
-        produits = data.Data_substitution(cat)
+        produits = data.DataSubstitution(cat)
         cat_ch = produits.display()
         if cat_ch == 0:
             self.reponse = "accueil"
@@ -95,7 +95,7 @@ class Application:
 
         print(self.menu)
         self.reponse = ""
-        selection = data.Data_categories()
+        selection = data.DataCategories()
         selection.display()
         choix = selection.select()
         if choix == 0:
@@ -114,7 +114,7 @@ class Application:
             The favoris menu prints the Substitutes table.
         """
 
-        substitution_table = data.Data_favorites()
+        substitution_table = data.DataFavorites()
         print(self.menu)
         self.reponse = input("Où désirez-vous aller ? ")
         if not self.reponse.startswith("__") and self.reponse in vars(Application):

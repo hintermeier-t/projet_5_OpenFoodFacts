@@ -8,6 +8,9 @@
 """
 
 import getpass
+import os
+
+import dotenv
 
 
 class Configuration:
@@ -24,15 +27,21 @@ class Configuration:
     """
 
     def __init__(self):
-
         """
             The __init__ method ask the user and the password to connect the
             MySQL Database on localhost.
         """
 
-        self._user = input("Entrez votre User MySQL: ")
-        self._password = getpass.getpass("Entrez votre mot de passe MySQL: ")
-        self._host = "127.0.0.1"
+        dotenv.load_dotenv()
+        if os.getenv("P_USER") == " ":
+            self._user = input("Entrez votre User MySQL: ")
+        else:
+            self._user = os.getenv("P_USER")
+        if os.getenv("P_PASSWD") ==" ":
+            self._password = getpass.getpass("Entrez votre mot de passe MySQL: ")
+        else:
+            self._password = os.getenv("P_PASSWD")
+        self._host = os.getenv("P_HOST")
 
     @property
     def user(self):
