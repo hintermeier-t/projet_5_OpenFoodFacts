@@ -61,18 +61,18 @@ class Data:
         index = 1
         # -  URL to restrict to the French products
         self.request_url = "https://fr.openfoodfacts.org/cgi/search.pl"
-        self.request_params = {
+        
+        try:
+            for index in range(MAX_PAGES):
+                self.request_params = {
             "action": "process",
             # -  We chose the most wanted products
             "sort_by": "unique_scans_n",
             "page_size": 20,
-            "page": index,
+            "page": index+1,
             # -  We'll need a json to process the data
             "json": 1
         }
-        try:
-            for index in range(MAX_PAGES):
-
                 response = r.get(self.request_url, self.request_params)
                 if response.status_code == 200:  # -  if success
                     self.data.extend(response.json()['products'])
@@ -190,13 +190,13 @@ class Saver:
 
         for data in data_list:
             for category in self.categories:
-                if category in [dat.strip() for dat in data.get('categories').split(',')]:
+                if category in data.get('categories').split(','):
                     categorized, created = tables.Categorized.get_or_create(
                         fk_product=tables.Products.get(
                             tables.Products.code == data.get('code')),
                         fk_category=tables.Categories.get(
-                            tables.Categories.name == category.strip())
-                    )
+                            tables.Categories.name == category 
+                    ))
             for store in self.stores:
                 if store in data.get('stores').split(','):
                     buyable, created = tables.Buyable.get_or_create(

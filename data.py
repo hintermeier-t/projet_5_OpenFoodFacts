@@ -137,17 +137,22 @@ class Data_substitution:
             print(
                 "ID: ",
                 produit.id,
-                "\nNOM: ",
+                "\tNOM: ",
                 produit.name,
-                "\nMARQUE: ",
+                "\tMARQUE: ",
                 produit.brand_name,
-                "\nNUTRISCORE: ",
+                "\tNUTRISCORE: ",
                 produit.nutriscore,
-                "\n\n\n",
+                "\n",
             )
-            return input(
-                "Sélectionner l'ID d'un produit pour trouver un substitut"
+        choix = input(
+            "Sélectionner l'ID d'un produit pour trouver un substitut ou\
+             \"p\" pour retourner au menu précédent: "
             )
+        if choix == 'p':
+            return 0
+        else:
+            return choix
 
     def select(self, product_id):
         """
@@ -162,13 +167,14 @@ class Data_substitution:
             SQL:
             SELECT * FROM Products
             WHERE Products.id IN (
-                SELECT * FROM Categorized
-                WHERE (Categorized.fk_category_id IN (
-                    SELECT * FROM Categorized
+                SELECT fk_product_id FROM Categorized
+                WHERE (Categorized.fk_category_id
+                 IN ( SELECT fk_category_id FROM Categorized
                     WHERE Categorized.fk_product_id = product_id)
                 )
-                    Categorized.fk_product_id = product_id
-                    AND Products.nutriscore IN ref_ns);
+                    AND Categorized.fk_product_id != product_id
+                    AND Products.nutriscore IN ref_ns
+            );
 
         """
         ref = tables.Products.get(tables.Products.id == product_id)
@@ -184,8 +190,7 @@ class Data_substitution:
 
         for element in tables.Categorized.select().where(
             tables.Categorized.fk_category.in_(prod_cat)
-            & tables.Categorized.fk_product
-            != product_id
+            & tables.Categorized.fk_product != product_id
         ):
             prod_comp.append(element.fk_product)
 
@@ -205,7 +210,7 @@ class Data_substitution:
                     produit.brand_name,
                     "\nNUTRISCORE: ",
                     produit.nutriscore,
-                    "\n\n\n",
+                    "\n",
                 )
 
     def substitution(self, product_id):
@@ -237,6 +242,7 @@ class Data_substitution:
                     ),
                 )
                 print("Produit enregistré")
+        return 0
 
 
 class Data_favorites:
@@ -268,7 +274,7 @@ class Data_favorites:
         """
 
         self.substitutes = tables.Substitutes.select()
-        print("Voici les produits que vous avez enregistré:")
+        print("Voici les produits que vous avez enregistré:\n\n")
         for product in self.substitutes:
             original = tables.Products.get(
                 tables.Products.id == product.fk_base_product
@@ -277,23 +283,23 @@ class Data_favorites:
                 tables.Products.id == product.fk_healthier_product
             )
             print(
-                " Produit de base :\nID:",
-                original.id,
-                "\nNom:",
-                original.name,
-                "\nMarque:",
-                original.brand_name,
-                "\nNutriscore:",
-                original.nutriscore,
-                "\n\n",
-                "Produit de substitution :",
+                "Produit de base :",
+                "Produit de substitution :".rjust(100-len("Produit de base :")),
                 "\nID:",
+                original.id,
+                "ID:".rjust(100-len(str(original.id))),
                 healthier.id,
                 "\nNom:",
+                original.name,
+                "Nom:".rjust(100-len(str(original.name))),
                 healthier.name,
                 "\nMarque:",
+                original.brand_name,
+                "Marque:".rjust(100-len(str(original.brand_name))),
                 healthier.brand_name,
                 "\nNutriscore:",
+                original.nutriscore,
+                "Nutriscore:".rjust(100-len(str(original.nutriscore))),
                 healthier.nutriscore,
                 "\n\n",
             )

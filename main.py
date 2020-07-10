@@ -13,9 +13,9 @@ import install
 def main():
     db = tables.db
     db.close()  # - if not closed properly on precedent use
-
+    
+    
     if "install" in sys.argv:
-
         db.connect()
         raw_data = install.Data()
         db.create_tables([tables.Products, tables.Categories, tables.Stores,

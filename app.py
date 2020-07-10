@@ -56,13 +56,20 @@ class Application:
 
         produits = data.Data_substitution(cat)
         cat_ch = produits.display()
+        if cat_ch == 0:
+            self.reponse = "accueil"
+            return self.reponse.strip(), args
         produits.select(int(cat_ch))
-        produits.substitution(int(cat_ch))
+        save = produits.substitution(int(cat_ch))
         self.reponse = ""
-        while self.choice(self.reponse):
-            self.reponse = input("Où désirez-vous aller ? : ")
-            if not self.reponse.startswith("__") and self.reponse in vars(Application):
-                return self.reponse.strip(), args
+        if save == 0:
+            while self.choice(self.reponse):
+                self.reponse = input("Où désirez-vous aller ? : ")
+                if not self.reponse.startswith("__") and self.reponse in vars(Application):
+                    return self.reponse.strip(), args
+        self.reponse = "accueil"
+        return self.reponse.strip(), args
+       
 
     def accueil(self, **args):
 
@@ -98,6 +105,8 @@ class Application:
                 return self.reponse.strip(), args
         else:
             self.enregistrement(int(choix))
+        self.reponse = "accueil"
+        return self.reponse, args
 
     def favoris(self, **args):
 
@@ -121,7 +130,7 @@ class Application:
         self.running = False
         return "", args
 
-    def start(self):
+    def start(self, **args):
 
         """
             Launch the menu, and refresh.
@@ -131,5 +140,4 @@ class Application:
         args = {}
         while self.running:
             ret = getattr(self, self._next)(**args)
-            print(ret)
             self._next, args = ret
