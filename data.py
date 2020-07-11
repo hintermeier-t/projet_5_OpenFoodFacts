@@ -39,8 +39,8 @@ class DataCategories:
     :select(self): Ask the use to chose one of the 5 categories, or pass
         the choice.
     """
-    def __init__(self):
 
+    def __init__(self):
         """
             The __init__ method send the query and save it in self.data
 
@@ -51,16 +51,16 @@ class DataCategories:
         """
 
         self.data = tables.Categories.select().order_by(fn.Rand()).limit(5)
-    def display(self):
 
+    def display(self):
         """
             The display method just prints the 5 categories
         """
 
         for cat in self.data:
             print("ID :", cat.id, " Nom : ", cat.name)
-    def select(self):
 
+    def select(self):
         """
             The select method ask the user to chose one of the 5 categories
         """
@@ -70,10 +70,7 @@ class DataCategories:
                 "Choisissez une des catégories en entrant son ID (ou"
                 "  entrez \"p\" pour revenir à l'affichage du menu: "
             )
-            if reponse == 'p':
-                return 0
-            else:
-                return reponse
+        return reponse
 
 
 class DataSubstitution:
@@ -135,23 +132,20 @@ class DataSubstitution:
         """
         for produit in self.prod:
             print("\n",
-                "ID: ",
-                produit.id,
-                "\tNOM: ",
-                produit.name,
-                "\tMARQUE: ",
-                produit.brand_name,
-                "\tNUTRISCORE: ",
-                produit.nutriscore
-            )
+                  "ID: ",
+                  produit.id,
+                  "\tNOM: ",
+                  produit.name,
+                  "\tMARQUE: ",
+                  produit.brand_name,
+                  "\tNUTRISCORE: ",
+                  produit.nutriscore
+                  )
         choix = input(
             "Sélectionner l'ID d'un produit pour trouver un substitut ou\
              \"p\" pour retourner au menu précédent: "
-            )
-        if choix == 'p':
-            return 0
-        else:
-            return choix
+        )
+        return choix
 
     def select(self, product_id):
         """
@@ -229,19 +223,16 @@ class DataSubstitution:
                 "Choisissez un des produits à substituer en entrant son ID (ou"
                 "  entrez \"p\" pour revenir à l'affichage du menu: "
             )
-            if reponse == 'p':
-                return 0
-            else:
-                tables.Substitutes.get_or_create(
-                    fk_base_product=tables.Products.get(
-                        tables.Products.id == product_id
-                    ),
-                    fk_healthier_product=tables.Products.get(
-                        tables.Products.id == reponse
-                    ),
-                )
-                print("Produit enregistré")
-        return 0
+            tables.Substitutes.get_or_create(
+                fk_base_product=tables.Products.get(
+                    tables.Products.id == product_id
+                ),
+                fk_healthier_product=tables.Products.get(
+                    tables.Products.id == reponse
+                ),
+            )
+            print("Produit enregistré")
+        return reponse
 
 
 class DataFavorites:
@@ -262,7 +253,6 @@ class DataFavorites:
     """
 
     def __init__(self):
-
         """
             The __init__ method. Selects and display the products from the
             Substitutes table.
@@ -283,7 +273,8 @@ class DataFavorites:
             )
             print(
                 "Produit de base :",
-                "Produit de substitution :".rjust(100-len("Produit de base :")),
+                "Produit de substitution :".rjust(
+                    100-len("Produit de base :")),
                 "\nID:",
                 original.id,
                 "ID:".rjust(100-len(str(original.id))),

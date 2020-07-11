@@ -14,7 +14,6 @@ import dotenv
 
 
 class Configuration:
-
     """
         The Configuration class gather the required informations to connect to the 
         database.
@@ -33,11 +32,11 @@ class Configuration:
         """
 
         dotenv.load_dotenv()
-        if os.getenv("P_USER") == " ":
+        if os.getenv("P_USER") == "":
             self._user = input("Entrez votre User MySQL: ")
         else:
             self._user = os.getenv("P_USER")
-        if os.getenv("P_PASSWD") ==" ":
+        if os.getenv("P_PASSWD") =="":
             self._password = getpass.getpass("Entrez votre mot de passe MySQL: ")
         else:
             self._password = os.getenv("P_PASSWD")

@@ -33,23 +33,26 @@ class Application:
         """
 
         self._next = "accueil"
-        self.menu = "Voici la liste des commandes de menu :\n\
-            * accueil - Menu d'Accueil\n\
-            * categories - Rechercher par catégories de produits\n\
-            * favoris - Afficher les produits sauvés et leurs substituts\n\
-            * quitter - Quitte l'Application"
+        self.menu = {
+            "1": "Accueil",
+            "2": "Categories",
+            "3": "Favoris",
+            "4": "Quitter"
+        }
 
-    def choice(self, rep):
+    def choice(self, **args):
         """
             The choice method verify the user's input.
         """
-
-        if rep.startswith("__") or rep not in vars(Application)\
-                or rep == "":
-            return True
+        print("Voici le menu:")
+        for key, value in self.menu.items():
+            print(key, ' : ', value)
+        rep = ""
+        while rep.startswith("__") or rep not in self.menu.keys() or rep == "":
+            rep = input("Où désirez-vous aller ?: ")
+        return self.menu[rep].lower(), args
  
     def enregistrement(self, cat, **args):# limiter
-
         """
             The enregistrement sub-menu links a product to its substitutes.
         """
@@ -57,68 +60,47 @@ class Application:
         produits = data.DataSubstitution(cat)
         cat_ch = produits.display()
         if cat_ch == 0:
-            self.reponse = "accueil"
-            return self.reponse.strip(), args
+            return "accueil", args
         produits.select(int(cat_ch))
         save = produits.substitution(int(cat_ch))
-        self.reponse = ""
-        if save == 0:
-            while self.choice(self.reponse):
-                self.reponse = input("Où désirez-vous aller ? : ")
-                if not self.reponse.startswith("__") and self.reponse in vars(Application):
-                    return self.reponse.strip(), args
-        self.reponse = "accueil"
-        return self.reponse.strip(), args
+        if save == 'p':
+            return self.choice
+        return "accueil", args
        
 
     def accueil(self, **args):
-
         """
             The starting menu.
         """
 
         print("Bienvenue dans le programme de Recherche d'Aliments Saint")
-        print(self.menu)
-        self.reponse = ""
-        while self.choice(self.reponse):
-            self.reponse = input("Où désirez-vous aller ? ")
-        if not self.reponse.startswith("__") and self.reponse in vars(Application):
-            return self.reponse.strip(), args
+        return self.choice()
+        
 
     def categories(self, **args):
-
         """
             The categories method prints and ask the user to pick a category
             among 5 randomly chose.
         
         """
 
-        print(self.menu)
-        self.reponse = ""
+        print("Voici quelques catégories parmis lesquelles choisir:")
         selection = data.DataCategories()
         selection.display()
         choix = selection.select()
-        if choix == 0:
-            while self.choice(self.reponse):
-                self.reponse = input("Où désirez-vous aller ? : ")
-            if not self.reponse.startswith("__") and self.reponse in vars(Application):
-                return self.reponse.strip(), args
+        if choix == 'p':
+            return self.choice()
         else:
             self.enregistrement(int(choix))
-        self.reponse = "accueil"
-        return self.reponse, args
+        return "accueil", args
 
     def favoris(self, **args):
-
         """
             The favoris menu prints the Substitutes table.
         """
 
         substitution_table = data.DataFavorites()
-        print(self.menu)
-        self.reponse = input("Où désirez-vous aller ? ")
-        if not self.reponse.startswith("__") and self.reponse in vars(Application):
-            return self.reponse.strip(), args
+        return self.choice()
 
     def quitter(self, **args):
         
