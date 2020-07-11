@@ -70,7 +70,7 @@ class DataCategories:
                 "Choisissez une des catégories en entrant son ID (ou"
                 "  entrez \"p\" pour revenir à l'affichage du menu: "
             )
-        return reponse
+            return reponse
 
 
 class DataSubstitution:
@@ -173,20 +173,20 @@ class DataSubstitution:
         ref = tables.Products.get(tables.Products.id == product_id)
         ref_ns = ['A', 'B', 'C', 'D', 'E']
         ref_ns = ref_ns[: ref_ns.index(str(ref.nutriscore))]
-        prod_cat = []
-        prod_comp = []
+        prod_cat = set()
+        prod_comp = set()
 
         for element in tables.Categorized.select().where(
             tables.Categorized.fk_product == product_id
         ):
-            prod_cat.append(element.fk_category)
-
+            prod_cat.add(element.fk_category)
+        
         for element in tables.Categorized.select().where(
             tables.Categorized.fk_category.in_(prod_cat)
             & tables.Categorized.fk_product != product_id
         ):
-            prod_comp.append(element.fk_product)
-
+            prod_comp.add(element.fk_product)
+        
         self.final_query = tables.Products.select().where(
             tables.Products.id.in_(prod_comp)
             & tables.Products.nutriscore.in_(ref_ns)
@@ -220,17 +220,18 @@ class DataSubstitution:
         reponse = ""
         while reponse != 'p' and reponse not in self.final_query:
             reponse = input(
-                "Choisissez un des produits à substituer en entrant son ID (ou"
+                "Choisissez un des produits à substituer en entrant son ID ou"
                 "  entrez \"p\" pour revenir à l'affichage du menu: "
             )
-            tables.Substitutes.get_or_create(
-                fk_base_product=tables.Products.get(
-                    tables.Products.id == product_id
-                ),
-                fk_healthier_product=tables.Products.get(
-                    tables.Products.id == reponse
-                ),
-            )
+            if reponse != 'p':
+                tables.Substitutes.get_or_create(
+                    fk_base_product=tables.Products.get(
+                        tables.Products.id == product_id
+                    ),
+                    fk_healthier_product=tables.Products.get(
+                        tables.Products.id == reponse
+                    )
+                )
             print("Produit enregistré")
         return reponse
 

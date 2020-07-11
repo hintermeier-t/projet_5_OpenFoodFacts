@@ -59,13 +59,10 @@ class Application:
 
         produits = data.DataSubstitution(cat)
         cat_ch = produits.display()
-        if cat_ch == 0:
-            return "accueil", args
-        produits.select(int(cat_ch))
-        save = produits.substitution(int(cat_ch))
-        if save == 'p':
-            return self.choice
-        return "accueil", args
+        if cat_ch != 'p':
+            produits.select(int(cat_ch))
+            save = produits.substitution(int(cat_ch))
+        return self.choice()
        
 
     def accueil(self, **args):
@@ -88,11 +85,9 @@ class Application:
         selection = data.DataCategories()
         selection.display()
         choix = selection.select()
-        if choix == 'p':
-            return self.choice()
-        else:
+        if choix != 'p':
             self.enregistrement(int(choix))
-        return "accueil", args
+        return self.choice()
 
     def favoris(self, **args):
         """
