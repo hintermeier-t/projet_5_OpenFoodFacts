@@ -181,16 +181,20 @@ class DataSubstitution:
         ):
             prod_cat.add(element.fk_category)
         
-        for element in tables.Categorized.select().where(
-            tables.Categorized.fk_category.in_(prod_cat)
-            & tables.Categorized.fk_product != product_id
-        ):
+        for element in (tables.Categorized.select(
+                    tables.Categorized.fk_product,
+                    fn.count(tables.Categorized.fk_category).alias('nb'))
+                    .where(tables.Categorized.fk_category.in_(prod_cat))
+                    .group_by(tables.Categorized.fk_product)
+                    .order_by(fn.count(tables.Categorized.fk_category).desc())
+                    ):
             prod_comp.add(element.fk_product)
+            
         
         self.final_query = tables.Products.select().where(
             tables.Products.id.in_(prod_comp)
             & tables.Products.nutriscore.in_(ref_ns)
-        ).limit(15)
+        ).limit(5)
 
         if self.final_query.exists():
             for produit in self.final_query:
@@ -203,8 +207,17 @@ class DataSubstitution:
                     produit.brand_name,
                     "\nNUTRISCORE: ",
                     produit.nutriscore,
+                    "\nURL OPENFOODFACTS: ",
+                    produit.url,
                     "\n",
                 )
+            for magasin in (tables.Stores.select()
+                            .join(tables.Buyable)
+                            .where(tables.Buyable.fk_product = produit.id)
+                            .group_by(tabales.Stores.name)
+
+        else :
+            print("Désolé, nous n'avons trouvé aucune alternative à votre produit")
 
     def substitution(self, product_id):
         """
@@ -292,5 +305,10 @@ class DataFavorites:
                 original.nutriscore,
                 "Nutriscore:".rjust(100-len(str(original.nutriscore))),
                 healthier.nutriscore,
+                "\nURL OPENFOODFACTS: ",
+                    original.url,
+                "URL OPENFOODFACTS: ".rjust(100-len(str(original.nutriscore))),
+                    healthier.url,
+                )
                 "\n\n",
             )

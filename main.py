@@ -1,8 +1,11 @@
 # coding: utf-8
+"""
 
+
+"""
 # - Importing Standard Modules:
 import sys
-import getpass  # Will be used to enter the user password when accessing / creating Database
+import getpass
 
 # - Importing Custom Modules:
 import app
@@ -11,6 +14,10 @@ import install
 
 
 def main():
+    """
+
+
+    """
     db = tables.db
     db.close()  # - if not closed properly on precedent use
     

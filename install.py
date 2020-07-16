@@ -198,9 +198,3 @@ class Saver:
                         fk_store=tables.Stores.get(tables.Stores.name == store)
                     )
 
-
-"""
-
-
-
-"""
