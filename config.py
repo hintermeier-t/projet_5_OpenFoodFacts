@@ -43,6 +43,16 @@ class Configuration:
             self._password = os.getenv("P_PASSWD")
         self._host = os.getenv("P_HOST")
 
+    def create (self):
+        creation = m.connect(
+            host = self._host,
+            user = self._user,
+            password = self._password
+        )
+        cursor = creation.cursor()
+        cursor.execute("CREATE DATABASE IF NOT EXISTS openfoodfacts")
+        creation.close()
+        
     @property
     def user(self):
         return self._user

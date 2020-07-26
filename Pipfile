@@ -14,6 +14,7 @@ peewee = "*"
 requests = "*"
 python-dotenv = "*"
 mysql-connector-python = "*"
+pymysql = "*"
 
 [requires]
 python_version = "3.8"
