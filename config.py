@@ -11,6 +11,7 @@ import getpass
 import os
 
 import dotenv
+import mysql.connector as m
 
 
 class Configuration:

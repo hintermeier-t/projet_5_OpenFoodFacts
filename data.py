@@ -211,10 +211,11 @@ class DataSubstitution:
                     produit.url,
                     "\n",
                 )
-            for magasin in (tables.Stores.select()
-                            .join(tables.Buyable)
-                            .where(tables.Buyable.fk_product = produit.id)
-                            .group_by(tabales.Stores.name)
+                for magasin in (tables.Stores.select()
+                                .join(tables.Buyable)
+                                .where(tables.Buyable.fk_product == produit.id)
+                                .group_by(tables.Stores.name)):
+                                print (magasin.name)
 
         else :
             print("Désolé, nous n'avons trouvé aucune alternative à votre produit")
@@ -309,6 +310,5 @@ class DataFavorites:
                     original.url,
                 "URL OPENFOODFACTS: ".rjust(100-len(str(original.nutriscore))),
                     healthier.url,
-                )
                 "\n\n",
             )

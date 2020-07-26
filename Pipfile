@@ -12,9 +12,8 @@ black = "==19.10b0"
 [packages]
 peewee = "*"
 requests = "*"
-pymysql = "*"
-mysql-connector = "*"
 python-dotenv = "*"
+mysql-connector-python = "*"
 
 [requires]
-python_version = "3.6"
+python_version = "3.8"

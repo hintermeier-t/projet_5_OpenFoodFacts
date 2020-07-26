@@ -1,6 +1,6 @@
 # coding: utf-8
 """
-
+    The main module, starting the program.
 
 """
 # - Importing Standard Modules:
@@ -11,11 +11,12 @@ import getpass
 import app
 import tables
 import install
+import config
 
 
 def main():
     """
-
+        Main function
 
     """
     db = tables.db
@@ -23,7 +24,6 @@ def main():
     
     
     if "install" in sys.argv:
-        db.connect()
         raw_data = install.Data()
         db.create_tables([tables.Products, tables.Categories, tables.Stores,
                           tables.Categorized, tables.Buyable, tables.Substitutes])

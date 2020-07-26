@@ -57,9 +57,9 @@ class Data:
         index = 1
         # -  URL to restrict to the French products
         self.request_url = "https://fr.openfoodfacts.org/cgi/search.pl"
-
+        max_pages = int(os.getenv("P_MAX_PAGES"))
         try:
-            for index in range(os.getenv("P_MAX_PAGES")):
+            for index in range(max_pages):
                 self.request_params = {
                     "action": "process",
                     # -  We chose the most wanted products
@@ -72,7 +72,7 @@ class Data:
                 response = r.get(self.request_url, self.request_params)
                 if response.status_code == 200:  # -  if success
                     self.data.extend(response.json()['products'])
-                    print("Downloading: {0}%".format(index*(100//MAX_PAGES)))
+                    print("Downloading: {0}%".format(index*(100//max_pages)))
                     sys.stdout.write("\033[F")  # -  Update screen
 
         except r.ConnectionError:
@@ -106,7 +106,8 @@ class Cleaner:
             # - First, we check if the required informations exist.
 
             if (data.get('code') and data.get('categories') and
-            data.get('nutriscore_grade') and data.get('product_name_fr')):
+            data.get('nutriscore_grade') and data.get('product_name_fr')
+            and data.get('url')):
                 self.cleaned_data.append(data)
 
         for data in self.cleaned_data:

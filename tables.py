@@ -64,9 +64,9 @@ class Products (Database):
         ---------
     """
     id = p.AutoField(primary_key=True, unique=True)
-    name = p.CharField(100)
+    name = p.CharField(50)
     code = p.BitField()
-    brand_name = p.CharField(100)
+    brand_name = p.CharField(50)
     description = p.TextField()
     nutriscore = p.CharField(1)
     url = p.TextField()
