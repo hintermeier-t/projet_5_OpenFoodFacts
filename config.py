@@ -50,6 +50,7 @@ class Configuration:
             password = self._password
         )
         cursor = creation.cursor()
+        cursor.execute("DROP DATABASE IF EXISTS openfoodfacts")
         cursor.execute("CREATE DATABASE IF NOT EXISTS openfoodfacts")
         creation.close()
         

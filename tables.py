@@ -31,6 +31,7 @@ import peewee as p
 import config as c
 
 configuration = c.Configuration()
+# configuration.create()
 db = p.MySQLDatabase("openfoodfacts", host=configuration.host,
                      user=configuration.user, passwd=configuration.password)
 
@@ -67,7 +68,7 @@ class Products (Database):
     name = p.CharField(50)
     code = p.BitField()
     brand_name = p.CharField(50)
-    description = p.TextField()
+    description = p.TextField(null = True)
     nutriscore = p.CharField(1)
     url = p.TextField()
 
