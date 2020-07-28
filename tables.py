@@ -31,7 +31,6 @@ import peewee as p
 import config as c
 
 configuration = c.Configuration()
-configuration.create()
 db = p.MySQLDatabase("openfoodfacts", host=configuration.host,
                      user=configuration.user, passwd=configuration.password)
 

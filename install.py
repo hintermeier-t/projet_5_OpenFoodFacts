@@ -107,7 +107,7 @@ class Cleaner:
 
             if (data.get('code') and data.get('categories') and
             data.get('nutriscore_grade') and data.get('product_name_fr')
-            and data.get('url')):
+            and data.get('url') and data.get('stores')):
                 self.cleaned_data.append(data)
 
         for data in self.cleaned_data:
