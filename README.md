@@ -18,7 +18,8 @@ You can grab them here :    https://dev.mysql.com/downloads/
 INSTALLATION / LAUNCHING THE PROGRAM
 ------------------------
 In a command prompt do:
->pipenv install
+``code
+pipenv install``
 The environnement should loads itself. Then do :
 >pipenv run python -m main install
 This should create the database and download the data.
